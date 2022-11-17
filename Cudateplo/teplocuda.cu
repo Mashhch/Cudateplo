@@ -59,35 +59,6 @@ __global__ void method_progonki(double* a, double* b, double* c, double* d, doub
 
 
 
-__global__ void next_2_ord_0n(double* d, double* prev, double t, double* x,int n) {
-
-	//a[0] = 0;
-	//c[n - 1] = 0;
-
-	if (constants[0] == 0) {
-		//b[0] = constants[2];
-		d[0] = gamma1(t*constants[7]);
-	}
-	else
-	{
-		//b[0] = 1 - powf(constants[4], 2) * constants[7] / (powf(constants[5], 2) * 2) * (-2 + constants[2] * 2 * constants[5] / constants[0]);
-		//c[0] = -powf(constants[4], 2) * constants[7] / powf(constants[5], 2);
-		d[0] = prev[0] + powf(constants[4], 2) * constants[7] / (2 * powf(constants[5], 2))*(-gamma1(t*constants[7]) * 2 * constants[5] / constants[0] + prev[1] - 2 * prev[0] + prev[1]
-			- (gamma1((t - 1)*constants[7]) - constants[2] * prev[0]) * 2 * constants[5] / constants[0]) + constants[7] * f(x[0], (t - 0.5)*constants[7]);
-	}
-	if (constants[1] == 0) {
-		//a[n - 1] = 0;
-		//b[n - 1] = constants[3];
-		d[n - 1] = gamma2(t*constants[7]);
-	}
-	else {
-		d[n - 1] = prev[0] + powf(constants[4], 2) * constants[7] / (2 * powf(constants[5], 2))*(gamma2(t*constants[7]) * 2 * constants[5] / constants[1] + prev[n - 2] - 2 * prev[n - 1] + prev[n - 2]
-			+ (gamma2((t - 1)*constants[7]) - constants[3] * prev[0]) * 2 * constants[5] / constants[1]) + constants[7] * f(x[n - 1], (t - 0.5)*constants[7]);
-		//b[n - 1] = 1 - powf(constants[4], 2) * constants[7] / (powf(constants[5], 2) * 2)*(-2 - constants[3] * 2 * constants[5] / constants[1]);
-		//a[n - 1] = -powf(constants[4], 2) * constants[7] / powf(constants[5], 2);
-	}
-}
-
 __global__ void next_2_ord(double *a, double *b, double *c, double *d, double* prev, double t, double* x, int n) {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -241,7 +212,7 @@ int main()
 	abc << <32, 32 >> > (dev_a, dev_b, dev_c, N);
 	for (int i = 1; i < Nt; i++) {
 		next_2_ord << <32, 32 >> > (dev_a, dev_b, dev_c, dev_d, dev_prev, i, dev_x, N);
-		//next_2_ord_0n << <1, 1 >> > (dev_a, dev_b, dev_c, dev_d, dev_prev, i, dev_x, N);
+	
 
 		cudaMemcpy(a, dev_a, mem_size, cudaMemcpyDeviceToHost);
 
